@@ -1,0 +1,23 @@
+{
+  "devDependencies": {
+    "@playwright/test": "1.63.0",
+    "acorn": "8.18.0",
+    "esbuild": "0.28.2"
+  },
+  "name": "interval",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": "24.x"
+  },
+  "scripts": {
+    "setup": "node scripts/task.mjs setup",
+    "doctor": "node scripts/task.mjs doctor",
+    "dev": "node scripts/dev.mjs",
+    "worktree": "node scripts/worktree.mjs",
+    "check": "node scripts/task.mjs check",
+    "test:e2e": "playwright test",
+    "verify": "node scripts/task.mjs verify",
+    "test:report": "playwright show-report"
+  }
+}

@@ -9,15 +9,15 @@ import { fileURLToPath } from "node:url";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
 const backendSource = fs.readFileSync(path.join(root, "backend/convex/sync.ts"), "utf8");
-const acornModule = await import("../backend/node_modules/prettier/plugins/acorn.js");
-const { transform } = await import("../backend/node_modules/esbuild/lib/main.js");
+const { parse } = await import("acorn");
+const { transform } = await import("esbuild");
 
 const scripts = [...html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g)];
 assert.equal(scripts.length, 1, "expected one inline script");
 const inline = scripts[0][1];
-const sourceFile = await acornModule.default.parsers.acorn.parse(
+const sourceFile = parse(
   inline,
-  { filepath: "index.inline.js" },
+  { ecmaVersion: "latest" },
 );
 
 const wantedVariables = new Set(["PROBLEMS", "TIER_INFO", "lkey", "kkey", "validTime"]);

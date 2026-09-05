@@ -7,9 +7,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import vm from "node:vm";
 
-// Same resolution as check-state-merge.mjs: the repo ships no root package.json, so
-// esbuild is reached through the backend's install rather than a bare specifier.
-const { transform } = await import("../backend/node_modules/esbuild/lib/main.js");
+const { transform } = await import("esbuild");
 
 const root = new URL("../backend/convex/", import.meta.url);
 
