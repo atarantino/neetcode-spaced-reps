@@ -60,6 +60,43 @@ real editor and test runner. This repository does not bundle kata-machine code o
 
 Not affiliated with NeetCode or LeetCode.
 
+## Development and verification
+
+Use Node 24. From a fresh checkout:
+
+```bash
+npm ci
+npm run setup
+npm run doctor
+npm run dev
+```
+
+The server prints its URL and uses an available localhost port. Stop it with
+Ctrl-C. It reloads `index.html` on each request, disables sync/Google by default,
+and never changes the production configuration on disk. Use `PORT=8000 npm run dev`
+for a stable browser-storage origin, or give each worktree its own port.
+
+```bash
+npm run verify          # merge + rotation + TypeScript + browser checks
+npm run test:e2e        # desktop/mobile Chromium smoke tests
+npm run test:report     # inspect results; failures retain traces/screenshots
+npm run worktree -- feature/my-change ../interval-my-change
+```
+
+Worktree creation starts from committed HEAD and installs dependencies; uncommitted
+changes are not copied. Run `npm run dev` inside the new directory. Stop its server
+before removing it with `git worktree remove ../interval-my-change`.
+
+On a minimal Linux host, browser setup may also require
+`npx playwright install --with-deps chromium`. CI runs the same verification gate
+and retains browser reports for seven days.
+
+For optional backend QA, set `INTERVAL_SYNC_URL` to your disposable deployment's
+full `/sync` URL. `INTERVAL_GOOGLE_CLIENT_ID` enables real Google recovery; its
+origin must also be configured in Google and the backend. The default smoke suite
+uses an intercepted sync transport, so it does not establish real Convex or OAuth
+correctness. See [AGENTS.md](AGENTS.md) for isolation, debugging, and coverage limits.
+
 ## Running your own
 
 The static page works from any file host — or just open `index.html` locally. To self-host sync:
@@ -76,7 +113,7 @@ replace `GOOGLE_CLIENT_ID` in `index.html`, set the matching `GOOGLE_CLIENT_ID` 
 Convex environment, and add your site origin to `RECOVER_ORIGINS` in
 `backend/convex/http.ts`.
 
-After installing the backend dependencies, run the merge and key-rotation checks from
+After the development setup above, run the merge and key-rotation checks from
 the repository root:
 
 ```bash

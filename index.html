@@ -705,7 +705,7 @@ function mergeStates(a,b){
 }
 let syncInFlight=null;
 async function syncNow(){
-  const key = syncKey(); if(!key) return;
+  const key = syncKey(); if(!key || !SYNC_URL) return;
   if(syncInFlight) return syncInFlight;
   const request = (async()=>{
     const sentSnapshot = JSON.stringify(state);
@@ -2454,6 +2454,7 @@ document.getElementById('syncBtn').addEventListener('click', e=>{
 });
 syncbar.addEventListener('click', e=>{
   if(e.target.closest('[data-syncon]')){
+    if(!SYNC_URL) return toast('Sync is disabled in this development server');
     // A fresh random key is nobody's account key, so any stale sign-in has to go with it.
     localStorage.removeItem(GOOGLE_EMAIL_LS);
     localStorage.setItem(SYNC_KEY_LS, newSyncKey());

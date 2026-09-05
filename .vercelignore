@@ -1,3 +1,10 @@
 backend/
 node_modules/
 .env.local
+scripts/
+tests/
+playwright-report/
+test-results/
+playwright.config.mjs
+AGENTS.md
+.github/
