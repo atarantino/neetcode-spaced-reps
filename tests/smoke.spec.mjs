@@ -1,5 +1,34 @@
 import { test, expect, readState, logAttempt, openHistory } from './fixtures.mjs';
 
+test('All problems launches the selected workspace in a new tab', async ({ page, context }) => {
+  // Stub destinations so the test checks navigation without contacting either service.
+  await context.route(/^https:\/\/(neetcode\.io|leetcode\.com)\//, route =>
+    route.fulfill({ contentType: 'text/html', body: '<title>Problem workspace</title>' }));
+  await page.goto('/');
+  await page.locator('[data-tab="all"]').click();
+  await page.locator('[data-tier="75"]').click();
+  await page.locator('#searchBox').fill('Contains Duplicate');
+  await page.locator('[data-row="1"]').click();
+  const form = page.locator('[data-form="1"]');
+  for (const [pref, label, url, other] of [
+    ['nc', 'NeetCode', 'https://neetcode.io/problems/duplicate-integer?list=blind75', 'LeetCode'],
+    ['lc', 'LeetCode', 'https://leetcode.com/problems/contains-duplicate/', 'NeetCode'],
+  ]) {
+    await page.locator(`[data-linkpref="${pref}"]`).click();
+    const launch = form.getByRole('link', { name: `Solve on ${label} ↗`, exact: true });
+    await expect(launch).toBeVisible();
+    await expect(launch).toHaveAttribute('href', url);
+    await expect(form.getByRole('link', { name: `Open on ${other} ↗`, exact: true })).toBeVisible();
+    const popupPromise = page.waitForEvent('popup');
+    await launch.click();
+    const popup = await popupPromise;
+    await expect(popup).toHaveURL(url);
+    await popup.close();
+    await expect(form.locator('[data-save]')).toBeVisible();
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  }
+});
+
 test('attempt persists across reload and appears in history', async ({ page, isMobile }) => {
   await page.clock.setFixedTime(new Date('2026-09-05T19:00:00Z'));
   await page.goto('/');
